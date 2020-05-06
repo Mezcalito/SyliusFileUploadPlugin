@@ -1,0 +1,24 @@
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <defaults public="true" />
+
+        <service id="mezcalito_sylius_file_upload_plugin.file_uploader" class="Mezcalito\SyliusFileUploadPlugin\Uploader\FileUploader">
+            <argument type="service">
+                <service class="Gaufrette\Filesystem">
+                    <argument>%sylius.uploader.filesystem%</argument>
+                    <factory service="knp_gaufrette.filesystem_map" method="get" />
+                </service>
+            </argument>
+            <argument type="service" id="mezcalito_sylius_file_upload_plugin.file_path_generator" />
+        </service>
+
+        <service id="mezcalito_sylius_file_upload_plugin.file_path_generator" class="Mezcalito\SyliusFileUploadPlugin\Generator\UploadedFilePathGenerator" />
+
+        <service id="sylius.listener.files_remove" class="Mezcalito\SyliusFileUploadPlugin\EventListener\FilesRemoveListener">
+            <argument type="service" id="mezcalito_sylius_file_upload_plugin.file_uploader" />
+            <argument type="service" id="liip_imagine.cache.manager" />
+            <argument type="service" id="liip_imagine.filter.manager" />
+            <tag name="doctrine.event_listener" event="postRemove" />
+        </service>
+    </services>
+</container>
