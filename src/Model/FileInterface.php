@@ -12,8 +12,6 @@ interface FileInterface
 
     public function getMimeType(): ?string;
 
-    public function setMimeType(?string $mimeType): void;
-
     public function getFile(): ?\SplFileInfo;
 
     public function setFile(?\SplFileInfo $file): void;

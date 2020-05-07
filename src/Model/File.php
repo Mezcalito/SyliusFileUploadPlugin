@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mezcalito\SyliusFileUploadPlugin\Model;
 
 use SplFileInfo;
+use Symfony\Component\Mime\MimeTypes;
 
 abstract class File implements FileInterface
 {
@@ -50,14 +51,12 @@ abstract class File implements FileInterface
         $this->type = $type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getMimeType(): ?string
     {
         return $this->mimeType;
-    }
-
-    public function setMimeType(?string $mimeType): void
-    {
-        $this->mimeType = $mimeType;
     }
 
     /**
@@ -74,6 +73,12 @@ abstract class File implements FileInterface
     public function setFile(?SplFileInfo $file): void
     {
         $this->file = $file;
+
+        if (null !== $file) {
+            $this->mimeType = (new MimeTypes())->guessMimeType($file->getRealPath());
+        } else {
+            $this->mimeType = null;
+        }
     }
 
     /**

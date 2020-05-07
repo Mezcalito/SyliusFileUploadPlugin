@@ -5,7 +5,7 @@
         <service id="mezcalito_sylius_file_upload_plugin.file_uploader" class="Mezcalito\SyliusFileUploadPlugin\Uploader\FileUploader">
             <argument type="service">
                 <service class="Gaufrette\Filesystem">
-                    <argument>%sylius.uploader.filesystem%</argument>
+                    <argument>%mezcalito_sylius_file_upload_plugin.uploader.filesystem%</argument>
                     <factory service="knp_gaufrette.filesystem_map" method="get" />
                 </service>
             </argument>
@@ -14,11 +14,13 @@
 
         <service id="mezcalito_sylius_file_upload_plugin.file_path_generator" class="Mezcalito\SyliusFileUploadPlugin\Generator\UploadedFilePathGenerator" />
 
-        <service id="sylius.listener.files_remove" class="Mezcalito\SyliusFileUploadPlugin\EventListener\FilesRemoveListener">
+        <service id="mezcalito_sylius_file_upload_plugin.listener.files_remove" class="Mezcalito\SyliusFileUploadPlugin\EventListener\FilesRemoveListener">
             <argument type="service" id="mezcalito_sylius_file_upload_plugin.file_uploader" />
             <argument type="service" id="liip_imagine.cache.manager" />
             <argument type="service" id="liip_imagine.filter.manager" />
-            <tag name="doctrine.event_listener" event="postRemove" />
+            <tag name="doctrine.event_listener" event="onFlush" lazy="true" />
+            <tag name="doctrine.event_listener" event="postFlush" lazy="true" />
         </service>
+        <service id="Mezcalito\SyliusFileUploadPlugin\Uploader\FileUploaderInterface" alias="mezcalito_sylius_file_upload_plugin.file_uploader" />
     </services>
 </container>

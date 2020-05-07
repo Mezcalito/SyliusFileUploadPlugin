@@ -33,7 +33,7 @@ final class FilesUploadListener
 
             // upload failed ? Let's remove that file.
             if (null === $file->getPath()) {
-                $files->remove($file);
+                $files->removeElement($file);
             }
         }
     }

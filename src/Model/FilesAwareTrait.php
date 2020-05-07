@@ -11,6 +11,11 @@ trait FilesAwareTrait
     /** @var Collection|FileInterface[] */
     protected $files;
 
+    public function __construct()
+    {
+        $this->files = new ArrayCollection();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -89,7 +94,7 @@ trait FilesAwareTrait
     {
         if ($this->hasFile($file)) {
             $file->setOwner(null);
-            $this->files->remove($file);
+            $this->files->removeElement($file);
         }
     }
 }
