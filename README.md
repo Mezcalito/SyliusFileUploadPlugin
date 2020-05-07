@@ -23,7 +23,15 @@ return [
 ];
 ```
 
-And that's it.
+In your `config/packages/_sylius.yaml` file, add the following
+
+```yaml
+# config/packages/_sylius.yaml
+imports:
+    - { resource: "@MezcalitoSyliusFileUploadPlugin/Resources/config/app/config.yml"
+```
+
+> This file defines the gaufrette `filesystem` and `adapter` used by the plugin, which you can override.
 
 ## Usage
 
