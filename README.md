@@ -28,7 +28,7 @@ In your `config/packages/_sylius.yaml` file, add the following
 ```yaml
 # config/packages/_sylius.yaml
 imports:
-    - { resource: "@MezcalitoSyliusFileUploadPlugin/Resources/config/app/config.yml"
+    - { resource: "@MezcalitoSyliusFileUploadPlugin/Resources/config/app/config.yml" }
 ```
 
 > This file defines the gaufrette `filesystem` and `adapter` used by the plugin, which you can override.
@@ -288,7 +288,7 @@ In order to handle the file upload you need to attach the `FilesUploadListener` 
 # services.yml
 services:
     app.listener.files_upload:
-        class: Mezcalito\SyliusFileUploadPlugin\FilesUploadListener
+        class: Mezcalito\SyliusFileUploadPlugin\EventListener\FilesUploadListener
         autowire: true
         autoconfigure: false
         public: false
@@ -411,3 +411,12 @@ App\Entity\ShippingMethod:
 ```
 
 [1]: https://docs.sylius.com/en/latest/cookbook/images/images-on-entity.html
+
+### 14. Migration
+
+Do the database migration
+
+```bash
+$ bin/console doctrine:migrations:diff
+$ bin/console doctrine:migrations:migrate
+```
