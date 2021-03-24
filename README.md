@@ -309,6 +309,14 @@ and render the `{{ form_row(form.files) }}` field.
 
 {% from '@SyliusAdmin/Macro/translationForm.html.twig' import translationForm %}
 
+{# Add the form theme to preview the file with the theme (there is a shortcut for 'fileProductTheme.html.twig' #}
+{# Check https://symfony.com/doc/current/form/form_themes.html for help #}
+{% form_theme form with [
+    '@SyliusAdmin/Form/imagesTheme.html.twig',
+    '@MezcalitoSyliusFileUploadPlugin/Form/theme.html.twig'
+] %}
+
+
 <div class="ui two column stackable grid">
     <div class="column">
         <div class="ui segment">

@@ -1,0 +1,8 @@
+
+sylius:
+    ui:
+        preview_file: Preview file
+    form:
+        file:
+            type: Type
+            file: File
