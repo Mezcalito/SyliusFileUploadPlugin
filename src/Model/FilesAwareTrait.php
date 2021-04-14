@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mezcalito\SyliusFileUploadPlugin\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 trait FilesAwareTrait
 {
