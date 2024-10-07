@@ -6,8 +6,7 @@ namespace Mezcalito\SyliusFileUploadPlugin\Model;
 
 trait FileAwareTrait
 {
-    /** @var null|FileInterface */
-    protected $file;
+    protected ?FileInterface $file;
 
     /**
      * {@inheritDoc}

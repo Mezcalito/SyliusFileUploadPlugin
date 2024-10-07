@@ -24,13 +24,7 @@ interface FileInterface  extends ResourceInterface
 
     public function setPath(?string $path): void;
 
-    /**
-     * @return object
-     */
-    public function getOwner();
+    public function getOwner(): mixed;
 
-    /**
-     * @param object|null $owner
-     */
-    public function setOwner($owner): void;
+    public function setOwner(mixed $owner): void;
 }

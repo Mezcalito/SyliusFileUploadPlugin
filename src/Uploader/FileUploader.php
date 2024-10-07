@@ -30,7 +30,6 @@ final class FileUploader implements FileUploaderInterface
             return;
         }
 
-        /** @var File $uploadedFile */
         $uploadedFile = $file->getFile();
 
         Assert::isInstanceOf($uploadedFile, File::class);
@@ -45,9 +44,14 @@ final class FileUploader implements FileUploaderInterface
 
         $file->setPath($path);
 
+        $filePath = $file->getPath();
+        $fileContent = file_get_contents($uploadedFile->getPathname());
+        if(null === $filePath || false === $fileContent) {
+            return;
+        }
         $this->filesystem->write(
-            $file->getPath(),
-            file_get_contents($uploadedFile->getPathname())
+            $filePath,
+            $fileContent
         );
     }
 

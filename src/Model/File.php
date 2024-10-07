@@ -9,28 +9,19 @@ use Symfony\Component\Mime\MimeTypes;
 
 abstract class File implements FileInterface
 {
-    /** @var mixed */
-    protected $id;
+    protected int $id;
 
-    /** @var null|string */
-    protected $type;
+    protected ?string $type;
 
-    /** @var null|string */
-    protected $mimeType;
+    protected ?string $mimeType;
 
-    /** @var SplFileInfo */
-    protected $file;
+    protected ?SplFileInfo $file;
 
-    /** @var string */
-    protected $path;
+    protected ?string $path;
 
-    /** @var object */
-    protected $owner;
+    protected mixed $owner;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -116,7 +107,7 @@ abstract class File implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getOwner()
+    public function getOwner(): mixed
     {
         return $this->owner;
     }
@@ -124,7 +115,7 @@ abstract class File implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function setOwner($owner): void
+    public function setOwner(mixed $owner): void
     {
         $this->owner = $owner;
     }

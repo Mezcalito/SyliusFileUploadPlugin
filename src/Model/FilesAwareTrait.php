@@ -9,8 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 trait FilesAwareTrait
 {
-    /** @var Collection|FileInterface[] */
-    protected $files;
+    /** @var Collection<int, FileInterface> */
+    protected Collection $files;
 
     public function __construct()
     {

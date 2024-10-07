@@ -14,33 +14,25 @@ use Mezcalito\SyliusFileUploadPlugin\Uploader\FileUploaderInterface;
 
 final class FilesRemoveListener
 {
-    /** @var FileUploaderInterface */
-    private $uploader;
-
-    /** @var CacheManager */
-    private $cacheManager;
-
-    /** @var FilterManager */
-    private $filterManager;
 
     /** @var string[] */
-    private $filesToDelete = [];
+    private array $filesToDelete = [];
 
-    public function __construct(FileUploaderInterface $uploader, CacheManager $cacheManager, FilterManager $filterManager) {
-        $this->uploader = $uploader;
-        $this->cacheManager = $cacheManager;
-        $this->filterManager = $filterManager;
+    public function __construct(
+        protected readonly FileUploaderInterface $uploader,
+        protected readonly CacheManager $cacheManager,
+        protected readonly FilterManager $filterManager) {
     }
 
     public function onFlush(OnFlushEventArgs $event): void
     {
-        foreach ($event->getEntityManager()->getUnitOfWork()->getScheduledEntityDeletions() as $entityDeletion) {
+        foreach ($event->getObjectManager()->getUnitOfWork()->getScheduledEntityDeletions() as $entityDeletion) {
             if (!$entityDeletion instanceof FileInterface) {
                 continue;
             }
 
-            if (!in_array($entityDeletion->getPath(), $this->filesToDelete)) {
-                $this->filesToDelete[] = $entityDeletion->getPath();
+            if (!in_array($entityDeletion->getPath(), $this->filesToDelete, true)) {
+                $this->filesToDelete[] = (string) $entityDeletion->getPath();
             }
         }
     }

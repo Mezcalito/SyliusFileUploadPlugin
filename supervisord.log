@@ -1,0 +1,30 @@
+2024-10-07 10:06:55,993 INFO Set uid to user 0 succeeded
+2024-10-07 10:06:56,000 INFO supervisord started with pid 1
+2024-10-07 10:06:57,003 INFO spawned: 'nginx' with pid 7
+2024-10-07 10:06:57,008 INFO spawned: 'php-fpm' with pid 8
+2024-10-07 10:06:58,078 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 10:06:58,078 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 10:07:23,113 WARN received SIGTERM indicating exit request
+2024-10-07 10:07:23,114 INFO waiting for nginx, php-fpm to die
+2024-10-07 10:07:24,116 INFO stopped: php-fpm (exit status 0)
+2024-10-07 10:07:24,170 INFO stopped: nginx (exit status 0)
+2024-10-07 10:07:28,631 INFO Set uid to user 0 succeeded
+2024-10-07 10:07:28,635 INFO supervisord started with pid 1
+2024-10-07 10:07:29,640 INFO spawned: 'nginx' with pid 7
+2024-10-07 10:07:29,644 INFO spawned: 'php-fpm' with pid 8
+2024-10-07 10:07:30,732 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 10:07:30,733 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 10:24:41,047 WARN received SIGTERM indicating exit request
+2024-10-07 10:24:41,050 INFO waiting for nginx, php-fpm to die
+2024-10-07 10:24:42,053 INFO stopped: php-fpm (exit status 0)
+2024-10-07 10:24:42,115 INFO stopped: nginx (exit status 0)
+2024-10-07 12:06:47,038 INFO Set uid to user 0 succeeded
+2024-10-07 12:06:47,045 INFO supervisord started with pid 1
+2024-10-07 12:06:48,049 INFO spawned: 'nginx' with pid 6
+2024-10-07 12:06:48,054 INFO spawned: 'php-fpm' with pid 7
+2024-10-07 12:06:49,156 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 12:06:49,157 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-10-07 12:09:25,338 WARN received SIGTERM indicating exit request
+2024-10-07 12:09:25,339 INFO waiting for nginx, php-fpm to die
+2024-10-07 12:09:26,341 INFO stopped: php-fpm (exit status 0)
+2024-10-07 12:09:26,383 INFO stopped: nginx (exit status 0)
