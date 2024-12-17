@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mezcalito\SyliusFileUploadPlugin\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;

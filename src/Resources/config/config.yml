@@ -1,0 +1,12 @@
+parameters:
+  mezcalito_sylius_file_upload_plugin.uploader.filesystem: mezcalito_sylius_file_upload_plugin_files
+
+knp_gaufrette:
+  adapters:
+    mezcalito_sylius_file_upload_plugin_files:
+      local:
+        directory: "%sylius_core.public_dir%/media/file"
+        create: true
+  filesystems:
+    mezcalito_sylius_file_upload_plugin_files:
+      adapter: "%mezcalito_sylius_file_upload_plugin.uploader.filesystem%"

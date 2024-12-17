@@ -9,15 +9,16 @@ use Symfony\Component\Mime\MimeTypes;
 
 abstract class File implements FileInterface
 {
-    protected int $id;
 
-    protected ?string $type;
+    protected ?int $id = null;
 
-    protected ?string $mimeType;
+    protected ?string $type = null;
+
+    protected ?string $mimeType = null;
 
     protected ?SplFileInfo $file;
 
-    protected ?string $path;
+    protected ?string $path = null;
 
     protected mixed $owner;
 
