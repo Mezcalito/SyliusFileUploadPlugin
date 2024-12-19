@@ -1,0 +1,6 @@
+# @see https://github.com/Sylius/SyliusResourceBundle/blob/master/docs/index.md
+sylius_resource:
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/Entity'
+
