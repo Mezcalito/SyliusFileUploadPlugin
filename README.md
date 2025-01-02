@@ -40,56 +40,87 @@ imports:
 >Extending entities with an ``files`` field is quite a popular use case.
  In this cookbook we will present how to **add files to the Shipping Method entity**.
 
-### 1. Extend the ShippingMethod class with the FilesAwareInterface
+you can see this sample in test/Application.
 
-In order to override the `ShippingMethod` that lives inside of the SyliusCoreBundle,
-you have to create your own ShippingMethod class that will extend it:
+### 1. Create the book class with the FilesAwareInterface
+
 
 ```php
+# src/entity/book.php
 <?php
-
-declare(strict_types=1);
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Mezcalito\SyliusFileUploadPlugin\Model\FilesAwareInterface;
 use Mezcalito\SyliusFileUploadPlugin\Model\FilesAwareTrait;
-use Sylius\Component\Core\Model\ShippingMethod as BaseShippingMethod;
+use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Metadata\AsResource;
+use Sylius\Resource\Metadata\BulkDelete;
+use Sylius\Resource\Metadata\Create;
+use Sylius\Resource\Metadata\Delete;
+use Sylius\Resource\Metadata\Index;
+use Sylius\Resource\Metadata\Show;
+use Sylius\Resource\Metadata\Update;
 
-class ShippingMethod extends BaseShippingMethod implements FilesAwareInterface
+
+#[ORM\Entity]
+#[ORM\Table(name: 'app_book')]
+class Book implements ResourceInterface, FilesAwareInterface
 {
+
     use FilesAwareTrait {
         FilesAwareTrait::__construct as private initializeFilesCollection;
     }
-    
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
+
+    #[ORM\OneToMany( mappedBy: 'owner', targetEntity: BookFile::class, cascade: ['all'], orphanRemoval: true)]
+    #[ORM\JoinTable(name: 'app_book_file')]
+    protected Collection $files;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
     public function __construct() {
         $this->initializeFilesCollection();
     }
+
+
 }
+
 ```
 
 > Here we used the `FilesAwareTrait` which is provided for convenience.
 
-### 2. Register your extended ShippingMethod as a resource's model class
+### 2. Register your book as a resource's model class
 
-With such a configuration you will register your `ShippingMethod` class in order to override the default one:
-
-```yaml
-# config/packages/sylius_shipping.yaml
-sylius_shipping:
-    resources:
-        shipping_method:
-            classes:
-                model: App\Entity\ShippingMethod
-```
-
-### 3. Create the ShippingMethodFile class
-
-In the `App\Entity` namespace place the `ShippingMethodFile` class which should look like this:
+We will use the attributes:
 
 ```php
+# src/entity/Book.php
+#[AsResource(alias: 'app.book', section: 'admin', formType: BookType::class, templatesDir: '@SyliusAdmin\\shared\\crud', routePrefix: 'admin')]
+#[Index(grid: 'app_book')]
+#[Create]
+#[Update]
+#[Delete]
+#[Show]
+#[BulkDelete]
+#[Create(formType: BookType::class)]
+```
+
+### 3. Create the BookFile class
+
+In the `App\Entity` namespace place the `BookFile` class which should look like this:
+
+```php
+# src/entity/BookFile.php
 <?php
 
 declare(strict_types=1);
@@ -98,68 +129,102 @@ namespace App\Entity;
 
 use Mezcalito\SyliusFileUploadPlugin\Model\File;
 
-class ShippingMethodFile extends File
+class BookFile extends File
 {
 }
 ```
 
-### 4. Add the mapping file for the ShippingMethodFile
+### 4. Add the mapping and resource attributes for the BookFile
 
-Your new entity will be saved in the database, therefore it needs a mapping file, where you will set the `ShippingMethod` as the `owner`
-of the `ShippingMethodFile`.
+Your new entity will be saved in the database, therefore it needs a mapping file, where you will set the `Book` as the `owner`
+of the `BookFile`.
 
-```yaml
-# App/Resources/config/doctrine/ShippingMethodFile.orm.yml
-App\Entity\ShippingMethodFile:
-    type: entity
-    table: app_shipping_method_file
-    manyToOne:
-        owner:
-            targetEntity: App\Entity\ShippingMethod
-            inversedBy: files
-            joinColumn:
-                name: owner_id
-                referencedColumnName: id
-                nullable: false
-                onDelete: CASCADE
+```php
+# src/entity/BookFile.php
+
+#[AsResource(alias: 'test.book_file', section: 'admin', formType: BookFileType::class, routePrefix: 'admin')]
+class BookFile extends File
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne( targetEntity: Book::class, inversedBy: 'files')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected mixed $owner;
+}
 ```
 
-### 5. Modify the ShippingMethod's mapping file
+### 5. Create the book form type
 
-The newly added `files` field has to be added to the mapping, with a relation to the `ShippingMethodFile`:
+It needs to have the files field as a LiveCollectionType.
 
-```yaml
-# App/Resources/config/doctrine/ShippingMethod.orm.yml
-App\Entity\ShippingMethod:
-    type: entity
-    table: sylius_shipping_method
-    oneToMany:
-        files:
-            targetEntity: App\Entity\ShippingMethodFile
-            mappedBy: owner
-            orphanRemoval: true
-            cascade:
-                - all
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Form\Type;
+
+use Sylius\Bundle\AdminBundle\Form\Type\AddButtonType;
+use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
+
+class BookType extends AbstractResourceType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->add('files', LiveCollectionType::class, [
+            'entry_type' => BookFileType::class,
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'button_add_type' => AddButtonType::class,
+            'button_add_options' => [
+                'label' => 'sylius.ui.add_rule',
+            ],
+            'button_delete_options' => [
+                'label' => false,
+            ],
+        ]);
+    }
+    public function getBlockPrefix(): string
+    {
+        return 'app_admin_book';
+    }
+}
+
 ```
 
-### 6. Register the ShippingMethodFile as a resource
-
-The `ShippingMethodFile` class needs to be registered as a Sylius resource:
+Declare the form
 
 ```yaml
-# app/config/config.yml
-sylius_resource:
-    resources:
-        app.shipping_method_file:
-            classes:
-                model: App\Entity\ShippingMethodFile
+    app.book.form.type:
+        class: App\Form\Type\BookType
+        tags:
+            - { name: form.type }
+        arguments: ['%app.model.book.class%', '%app.book.form.type.validation_groups%']
 ```
 
-### 7. Create the ShippingMethodFileType class
+In case you need only a single file upload, this can be done in 2 very easy steps.
 
-This is how the class for `ShippingMethodFileType` should look like. Place it in the `App\Form\Type\` directory.
+First, in the code for the form provided above set `allow_add` and `allow_delete` to `false`
 
-.. code-block:: php
+Second, in the `__construct` method of the `Book` entity you defined earlier add the following:
+
+```php
+public function __construct()
+{
+    parent::__construct();
+    $this->files = new ArrayCollection();
+    $this->addFile(new BookFile());
+}
+```
+
+
+### 6. Create the book file form type
 
 ```php
 <?php
@@ -170,119 +235,140 @@ namespace App\Form\Type;
 
 use Mezcalito\SyliusFileUploadPlugin\Form\Type\FileType;
 
-final class ShippingMethodFileType extends FileType
+class BookFileType extends FileType
 {
     /**
      * {@inheritdoc}
      */
     public function getBlockPrefix(): string
     {
-        return 'app_shipping_method_file';
+        return 'app_admin_book_file';
     }
 }
 ```
-
-### 8. Register the ShippingMethodFileType as a service
-
-After creating the form type class, you need to register it as a `form.type` service like below:
-
+Declare the form
 ```yaml
-# services.yml
-services:
-    app.form.type.shipping_method_file:
-        class: App\Form\Type\ShippingMethodFileType
+    app.book_file.form.type:
+        class: App\Form\Type\BookFileType
         tags:
             - { name: form.type }
-        arguments: ['%app.model.shipping_method_file.class%']
+        arguments: ['%app.model.book_file.class%', '%app.book_file.form.type.validation_groups%']
+
 ```
 
-### 9. Add the ShippingMethodFileType to the resource form configuration
 
-What is more the new form type needs to be configured as the resource form of the `ShippingMethodFile`:
+### 7. Create the BookGrid
+create the file template field for the grid you can use `bin/console make:grid`
 
-```yaml
-# app/config/config.yml
-sylius_resource:
-    resources:
-        app.shipping_method_file:
-            classes:
-                form: App\Form\Type\ShippingMethodFileType
-```
-
-### 10. Extend the ShippingMethodType with the files field
-
-**Create the form extension class** for the `Sylius\Bundle\ShippingBundle\Form\Type\ShippingMethodType`:
-
-It needs to have the files field as a CollectionType.
 
 ```php
+# src/Grid/BookGrid.php
 <?php
 
-declare(strict_types=1);
+namespace App\Grid;
 
-namespace App\Form\Extension;
+use Sylius\Bundle\GridBundle\Builder\Action\CreateAction;
+use Sylius\Bundle\GridBundle\Builder\Action\DeleteAction;
+use Sylius\Bundle\GridBundle\Builder\Action\UpdateAction;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\BulkActionGroup;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\ItemActionGroup;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\MainActionGroup;
+use Sylius\Bundle\GridBundle\Builder\Field\TwigField;
+use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
+use Sylius\Bundle\GridBundle\Grid\AbstractGrid;
+use Sylius\Bundle\GridBundle\Grid\ResourceAwareGridInterface;
+use App\Entity\Book;
 
-use App\Form\Type\ShippingMethodFileType;
-use Sylius\Bundle\ShippingBundle\Form\Type\ShippingMethodType;
-use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\FormBuilderInterface;
-
-final class ShippingMethodTypeExtension extends AbstractTypeExtension
+final class BookGrid extends AbstractGrid implements ResourceAwareGridInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public static function getName(): string
     {
-        $builder->add('files', CollectionType::class, [
-            'entry_type' => ShippingMethodFileType::class,
-            'allow_add' => true,
-            'allow_delete' => true,
-            'by_reference' => false,
-            'label' => 'sylius.form.shipping_method.files',
-        ]);
+        return 'app_book';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType(): string
+    public function buildGrid(GridBuilderInterface $gridBuilder): void
     {
-        return ShippingMethodType::class;
+        $gridBuilder
+            // see https://github.com/Sylius/SyliusGridBundle/blob/master/docs/field_types.md
+            ->addActionGroup(
+                MainActionGroup::create(
+                    CreateAction::create(),
+                )
+            )
+            ->addActionGroup(
+                ItemActionGroup::create(
+                    // ShowAction::create(),
+                    UpdateAction::create(),
+                    DeleteAction::create()
+                )
+            )
+            ->addActionGroup(
+                BulkActionGroup::create(
+                    DeleteAction::create()
+                )
+            )
+            ->addField(
+                TwigField::create(name: 'files', template: 'book/grid/field/files.html.twig')->setPath('files'),
+            )
+        ;
+    }
+
+    public function getResourceClass(): string
+    {
+        return Book::class;
     }
 }
+
+```
+and the template for files
+```twig
+# templates/book/grid/field/file.html.twig
+{% for file in data %}
+    <a class="button" href="{{ asset('media/file/'~ file.path) }}" target="_blank">
+        {{ 'sylius.ui.preview_file'|trans }}
+    </a>
+{% endfor %}
 ```
 
-In case you need only a single file upload, this can be done in 2 very easy steps.
-
-First, in the code for the form provided above set `allow_add` and `allow_delete` to `false`
-
-Second, in the `__construct` method of the `ShippingMethod` entity you defined earlier add the following:
+### 8. Create the book form twig component
 
 ```php
-public function __construct()
+# src/Twig/Components/BookFormComponent.php
+<?php
+namespace App\Twig\Components;
+
+use Sylius\TwigHooks\LiveComponent\HookableLiveComponentTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\LiveCollectionTrait;
+use App\Entity\Book;
+use App\Form\Type\BookType;
+
+#[AsLiveComponent(template: '@SyliusAdmin/shared/crud/common/content/form.html.twig')]
+class BookFormComponent extends AbstractController
 {
-    parent::__construct();
-    $this->files = new ArrayCollection();
-    $this->addFile(new ShippingMethodFile());
+    use LiveCollectionTrait;
+    use DefaultActionTrait;
+    use HookableLiveComponentTrait; // for Sylius Twig Hooks
+
+    #[LiveProp]
+    public Book $resource;
+
+    protected function instantiateForm(): FormInterface
+    {
+        return $this->createForm(BookType::class, $this->resource);
+    }
 }
+
 ```
 
-```yaml
-# services.yml
-services:
-    app.form.extension.type.shipping_method:
-        class: App\Form\Extension\ShippingMethodTypeExtension
-        tags:
-            - { name: form.type_extension, extended_type: Sylius\Bundle\ShippingBundle\Form\Type\ShippingMethodType }
-```
+### 9. Declare the FilesUploadListener service
 
-### 11. Declare the FilesUploadListener service
+In order to handle the file upload you need to attach the `FilesUploadListener` to the `Book` entity events:
 
-In order to handle the file upload you need to attach the `FilesUploadListener` to the `ShippingMethod` entity events:
-
-.. code-block:: yaml
 
 ```yaml
 # services.yml
@@ -293,76 +379,42 @@ services:
         autoconfigure: false
         public: false
         tags:
-            - { name: kernel.event_listener, event: sylius.shipping_method.pre_create, method: uploadFiles }
-            - { name: kernel.event_listener, event: sylius.shipping_method.pre_update, method: uploadFiles }
+            - { name: kernel.event_listener, event: app.book.pre_create, method: uploadFiles }
+            - { name: kernel.event_listener, event: app.book.pre_update, method: uploadFiles }
 ```
 
-### 12. Render the files field in the form view
+### 10. Add Book section to menu
 
-In order to achieve that you will need to customize the form view from the `SyliusAdminBundle/views/ShippingMethod/_form.html.twig` file.
+```php
+# src/Menu/AdminMenuListener.php
+<?php
 
-Copy and paste its contents into your own `app/Resources/SyliusAdminBundle/views/ShippingMethod/_form.html.twig` file,
-and render the `{{ form_row(form.files) }}` field.
+declare(strict_types=1);
 
-```twig
-{# app/Resources/SyliusAdminBundle/views/ShippingMethod/_form.html.twig #}
+namespace App\Menu;
 
-{% from '@SyliusAdmin/Macro/translationForm.html.twig' import translationForm %}
+use Sylius\Bundle\UiBundle\Menu\Event\MenuBuilderEvent;
 
-{# Add the form theme to preview the file with the theme (there is a shortcut for 'fileProductTheme.html.twig' #}
-{# Check https://symfony.com/doc/current/form/form_themes.html for help #}
-{% form_theme form with [
-    '@SyliusAdmin/Form/imagesTheme.html.twig',
-    '@MezcalitoSyliusFileUploadPlugin/Form/theme.html.twig'
-] %}
+final class AdminMenuListener
+{
 
+    public function addAdminMenuItems(MenuBuilderEvent $event): void
+    {
+        $menu = $event->getMenu();
 
-<div class="ui two column stackable grid">
-    <div class="column">
-        <div class="ui segment">
-            {{ form_errors(form) }}
-            <div class="three fields">
-                {{ form_row(form.code) }}
-                {{ form_row(form.zone) }}
-                {{ form_row(form.position) }}
-            </div>
-            {{ form_row(form.enabled) }}
-            <h4 class="ui dividing header">{{ 'sylius.ui.availability'|trans }}</h4>
-            {{ form_row(form.channels) }}
-            <h4 class="ui dividing header">{{ 'sylius.ui.category_requirements'|trans }}</h4>
-            {{ form_row(form.category) }}
-            {% for categoryRequirementChoiceForm in form.categoryRequirement %}
-                {{ form_row(categoryRequirementChoiceForm) }}
-            {% endfor %}
-            <h4 class="ui dividing header">{{ 'sylius.ui.taxes'|trans }}</h4>
-            {{ form_row(form.taxCategory) }}
-            <h4 class="ui dividing header">{{ 'sylius.ui.shipping_charges'|trans }}</h4>
-            {{ form_row(form.calculator) }}
-            {% for name, calculatorConfigurationPrototype in form.vars.prototypes %}
-                <div id="{{ form.calculator.vars.id }}_{{ name }}" data-container=".configuration"
-                     data-prototype="{{ form_widget(calculatorConfigurationPrototype)|e }}">
-                </div>
-            {% endfor %}
+        $contentAdmin = $menu
+            ->addChild('new')
+            ->setLabel('app.ui.nav.menu.content_admin');
 
-            {# Here you go! #}
-            {{ form_row(form.files) }}
+        $contentAdmin->addChild('admin_book', ['route' => 'app_admin_book_index'])
+            ->setLabel('book')
+            ->setLabelAttribute('icon', 'window minimize');
 
-            <div class="ui segment configuration">
-                {% if form.configuration is defined %}
-                    {% for field in form.configuration %}
-                        {{ form_row(field) }}
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="column">
-        {{ translationForm(form.translations) }}
-    </div>
-</div>
+    }
+}
+
 ```
-
-### 13. Validation
+### 11. Validation
 
 Your form so far is working fine, but don't forget about validation.
 The easiest way is using validation config files under the `App/Resources/config/validation` folder.
@@ -370,8 +422,8 @@ The easiest way is using validation config files under the `App/Resources/config
 This could look like this for an image e.g.:
 
 ```yaml
-# src\Resources\config\validation\ShippingMethodFile.yml
-App\Entity\ShippingMethodFile:
+# src\Resources\config\validation\BookFile.yml
+App\Entity\BookFile:
   properties:
     file:
       - Image:
@@ -392,8 +444,8 @@ App\Entity\ShippingMethodFile:
 or for a PDF e.g.:
 
 ```yaml
-# src\Resources\config\validation\ShippingMethodFile.yml
-App\Entity\ShippingMethodFile:
+# src\Resources\config\validation\BookFile.yml
+App\Entity\BookFile:
   properties:
     file:
       - File:
@@ -420,7 +472,7 @@ App\Entity\ShippingMethod:
 
 [1]: https://docs.sylius.com/en/latest/cookbook/images/images-on-entity.html
 
-### 14. Migration
+### 12. Migration
 
 Do the database migration
 

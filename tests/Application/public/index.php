@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Tests\Mezcalito\SyliusFileUploadPlugin\Application\Kernel;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Mezcalito\SyliusFileUploadPlugin\Application\Kernel;
 
-require dirname(__DIR__) . '/config/bootstrap.php';
+require dirname(__DIR__).'/config/bootstrap.php';
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);

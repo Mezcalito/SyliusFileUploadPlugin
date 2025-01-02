@@ -20,13 +20,14 @@ class BookType extends AbstractResourceType
             'by_reference' => false,
             'button_add_type' => AddButtonType::class,
             'button_add_options' => [
-                'label' => 'sylius.ui.add_rule',
+                'label' => 'sylius.ui.add',
             ],
             'button_delete_options' => [
-                'label' => false,
+                'label' => 'sylius.ui.delete',
             ],
         ]);
     }
+
     public function getBlockPrefix(): string
     {
         return 'test_admin_book';

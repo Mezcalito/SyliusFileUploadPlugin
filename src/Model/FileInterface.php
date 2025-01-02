@@ -6,7 +6,7 @@ namespace Mezcalito\SyliusFileUploadPlugin\Model;
 
 use Sylius\Component\Resource\Model\ResourceInterface;
 
-interface FileInterface  extends ResourceInterface
+interface FileInterface extends ResourceInterface
 {
     public function getType(): ?string;
 

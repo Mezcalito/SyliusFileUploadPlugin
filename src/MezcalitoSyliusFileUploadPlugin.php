@@ -19,4 +19,3 @@ final class MezcalitoSyliusFileUploadPlugin extends AbstractResourceBundle
         ];
     }
 }
-

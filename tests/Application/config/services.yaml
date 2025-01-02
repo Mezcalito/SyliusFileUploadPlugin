@@ -1,3 +1,7 @@
+parameters:
+    test.book.form.type.validation_groups: ['sylius']
+    test.book_file.form.type.validation_groups: ['sylius']
+
 services:
     # Default configuration for services in *this* file
     _defaults:
@@ -28,3 +32,24 @@ services:
         class: Tests\Mezcalito\SyliusFileUploadPlugin\Application\src\Menu\AdminMenuListener
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
+    
+    app.book.form.type:
+        class: Tests\Mezcalito\SyliusFileUploadPlugin\Application\src\Form\Type\BookType
+        tags:
+            - { name: form.type }
+        arguments: ['%test.model.book.class%', '%test.book.form.type.validation_groups%']
+
+    app.book_file.form.type:
+        class: Tests\Mezcalito\SyliusFileUploadPlugin\Application\src\Form\Type\BookFileType
+        tags:
+            - { name: form.type }
+        arguments: ['%test.model.book_file.class%', '%test.book_file.form.type.validation_groups%']
+
+    app.listener.files_upload:
+        class: Mezcalito\SyliusFileUploadPlugin\EventListener\FilesUploadListener
+        autowire: true
+        autoconfigure: false
+        public: false
+        tags:
+            - { name: kernel.event_listener, event: app.book.pre_create, method: uploadFiles }
+            - { name: kernel.event_listener, event: app.book.pre_update, method: uploadFiles }

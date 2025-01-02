@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Mezcalito\SyliusFileUploadPlugin\Application\src\Twig\Components;
 
 use Sylius\TwigHooks\LiveComponent\HookableLiveComponentTrait;

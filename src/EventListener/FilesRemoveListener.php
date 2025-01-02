@@ -13,14 +13,14 @@ use Mezcalito\SyliusFileUploadPlugin\Uploader\FileUploaderInterface;
 
 final class FilesRemoveListener
 {
-
     /** @var string[] */
     private array $filesToDelete = [];
 
     public function __construct(
         protected readonly FileUploaderInterface $uploader,
         protected readonly CacheManager $cacheManager,
-        protected readonly FilterManager $filterManager) {
+        protected readonly FilterManager $filterManager)
+    {
     }
 
     public function onFlush(OnFlushEventArgs $event): void

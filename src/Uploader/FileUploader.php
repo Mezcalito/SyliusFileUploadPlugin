@@ -46,7 +46,7 @@ final class FileUploader implements FileUploaderInterface
 
         $filePath = $file->getPath();
         $fileContent = file_get_contents($uploadedFile->getPathname());
-        if(null === $filePath || false === $fileContent) {
+        if (null === $filePath || false === $fileContent) {
             return;
         }
         $this->filesystem->write(

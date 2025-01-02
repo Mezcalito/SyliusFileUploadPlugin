@@ -1,5 +1,4 @@
-include make/*.mk
-include /usr/local/mez-tool-cli/Makefile
+
 
 phpunit:
 	vendor/bin/phpunit

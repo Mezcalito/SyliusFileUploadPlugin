@@ -20,7 +20,6 @@ use Webmozart\Assert\Assert;
 
 final class FileUploadListener
 {
-
     public function __construct(protected readonly FileUploaderInterface $uploader)
     {
     }

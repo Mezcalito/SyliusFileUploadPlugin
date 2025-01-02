@@ -16,11 +16,6 @@ use Tests\Mezcalito\SyliusFileUploadPlugin\Application\src\Entity\Book;
 
 final class BookGrid extends AbstractGrid implements ResourceAwareGridInterface
 {
-    public function __construct()
-    {
-        // TODO inject services if required
-    }
-
     public static function getName(): string
     {
         return 'test_book';

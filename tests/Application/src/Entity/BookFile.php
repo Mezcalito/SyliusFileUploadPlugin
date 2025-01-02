@@ -18,7 +18,7 @@ class BookFile extends File
     #[ORM\Column(type: Types::INTEGER)]
     protected ?int $id = null;
 
-    #[ORM\ManyToOne( targetEntity: Book::class, inversedBy: 'files')]
+    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'files')]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     protected mixed $owner;
 }

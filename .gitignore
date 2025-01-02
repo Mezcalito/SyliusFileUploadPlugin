@@ -2,6 +2,8 @@
 /node_modules/
 /composer.lock
 
+/compose.override.yml
+
 /etc/build/*
 !/etc/build/.gitignore
 
@@ -16,3 +18,8 @@
 # Symfony CLI https://symfony.com/doc/current/setup/symfony_server.html#different-php-settings-per-project
 /.php-version
 /php.ini
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
