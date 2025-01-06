@@ -9,31 +9,27 @@ use Doctrine\Common\Collections\Collection;
 interface FilesAwareInterface
 {
     /**
-     * @return Collection|FileInterface[]
+     * @return Collection<int,FileInterface>
      */
     public function getFiles(): Collection;
 
     /**
-     * @param Collection|FileInterface[] $files
+     * @param Collection<int,FileInterface> $files
      */
     public function setFiles(Collection $files): void;
 
     /**
-     * @param $type string
-     * @return Collection|FileInterface[]
+     * @return Collection<int,FileInterface>
      */
     public function getFilesByType(string $type): Collection;
 
     /**
-     * @param string $mimeType
-     * @return Collection|FileInterface[]
+     * @return Collection<int,FileInterface>
      */
     public function getFilesByMimeType(string $mimeType): Collection;
 
     /**
-     * @param string $type
-     * @param string $mimeType
-     * @return Collection|FileInterface[]
+     * @return Collection<int,FileInterface>
      */
     public function getFilesByTypeAndMimeType(string $type, string $mimeType): Collection;
 

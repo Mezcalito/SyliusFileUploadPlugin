@@ -1,0 +1,5 @@
+{% for file in data %}
+    <a class="button" href="{{ asset('media/file/'~ file.path) }}" target="_blank">
+        {{ 'sylius.ui.preview_file'|trans }}
+    </a>
+{% endfor %}

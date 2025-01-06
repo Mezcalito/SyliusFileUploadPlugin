@@ -20,17 +20,12 @@ use Webmozart\Assert\Assert;
 
 final class FileUploadListener
 {
-    /** @var FileUploaderInterface */
-    private $uploader;
-
-    public function __construct(FileUploaderInterface $uploader)
+    public function __construct(protected readonly FileUploaderInterface $uploader)
     {
-        $this->uploader = $uploader;
     }
 
     public function uploadFile(GenericEvent $event): void
     {
-        /** @var FileAwareInterface $subject */
         $subject = $event->getSubject();
         Assert::isInstanceOf($subject, FileAwareInterface::class);
 

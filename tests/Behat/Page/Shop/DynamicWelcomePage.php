@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acme\SyliusExamplePlugin\Behat\Page\Shop;
 
 use FriendsOfBehat\PageObjectExtension\Page\SymfonyPage;
+use Webmozart\Assert\Assert;
 
 class DynamicWelcomePage extends SymfonyPage implements WelcomePageInterface
 {
@@ -13,7 +14,7 @@ class DynamicWelcomePage extends SymfonyPage implements WelcomePageInterface
      */
     public function getGreeting(): string
     {
-        return $this->getSession()->getPage()->waitFor(3, function (): string {
+        $greeting = $this->getSession()->getPage()->waitFor(3, function (): string {
             $greeting = $this->getElement('greeting')->getText();
 
             if ('Loading...' === $greeting) {
@@ -22,6 +23,10 @@ class DynamicWelcomePage extends SymfonyPage implements WelcomePageInterface
 
             return $greeting;
         });
+
+        Assert::string($greeting, 'Greeting should be a string, but it is not.');
+
+        return $greeting;
     }
 
     /**
@@ -38,7 +43,7 @@ class DynamicWelcomePage extends SymfonyPage implements WelcomePageInterface
     protected function getDefinedElements(): array
     {
         return array_merge(parent::getDefinedElements(), [
-            'greeting' => '#greeting',
+            'greeting' => '[data-test-dynamic-greeting]',
         ]);
     }
 }

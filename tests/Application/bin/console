@@ -1,10 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-use Tests\Acme\SyliusExamplePlugin\Application\Kernel;
+use Tests\Mezcalito\SyliusFileUploadPlugin\Application\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Debug\Debug;
+use Symfony\Component\ErrorHandler\Debug;
 
 set_time_limit(0);
 
@@ -23,7 +23,7 @@ if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-require dirname(__DIR__) . '/config/bootstrap.php';
+require dirname(__DIR__).'/config/bootstrap.php';
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);

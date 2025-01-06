@@ -14,6 +14,8 @@ final class MezcalitoSyliusFileUploadPlugin extends AbstractResourceBundle
 
     public function getSupportedDrivers(): array
     {
-        return [SyliusResourceBundle::DRIVER_DOCTRINE_ORM];
+        return [
+            SyliusResourceBundle::DRIVER_DOCTRINE_ORM,
+        ];
     }
 }
