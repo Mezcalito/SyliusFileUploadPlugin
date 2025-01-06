@@ -14,7 +14,7 @@ abstract class File implements FileInterface
 
     protected ?string $mimeType = null;
 
-    protected ?\SplFileInfo $file;
+    protected ?\SplFileInfo $file = null;
 
     protected ?string $path = null;
 
